@@ -59,12 +59,12 @@ $true, $false | ForEach-Object { # local and global apps
     Get-ChildItem $dir | Where-Object name -NE 'scoop' | ForEach-Object {
         $app = $_.name
         $status = app_status $app $global
-        if (!$status.outdated -and !$status.failed -and !$status.deprecated -and !$status.removed -and !$status.missing_deps) { return }
+        if (!$status.outdated -and !$status.failed -and !$status.deprecated -and !$status.removed -and !$status.renamed -and !$status.missing_deps) { return }
 
         $item = [ordered]@{}
         $item.Name = $app
         $item.'Installed Version' = $status.version
-        $item.'Latest Version' = if ($status.outdated) { $status.latest_version } else { "" }
+        $item.'Latest Version' = if ($status.outdated -or $status.renamed) { $status.latest_version } else { "" }
         $item.'Missing Dependencies' = $status.missing_deps -Split ' ' -Join ' | '
         $info = @()
         if ($status.failed)     { $info += 'Install failed' }
@@ -72,6 +72,7 @@ $true, $false | ForEach-Object { # local and global apps
         if ($status.pinned)     { $info += 'Pinned' }
         if ($status.deprecated) { $info += 'Deprecated' }
         if ($status.removed)    { $info += 'Manifest removed' }
+        if ($status.renamed)    { $info += "Moved to $($status.renamed)" }
         $item.Info = $info -join ', '
         $item.Changelog = if ($status.outdated) { $status.changelog } else { '' }
         $list += [PSCustomObject]$item

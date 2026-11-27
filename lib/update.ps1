@@ -161,7 +161,7 @@ function Sync-Bucket {
                 Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-status', $previousCommit) | ForEach-Object {
                     $status, $file = $_ -split '\s+', 2
                     $filePath = Join-Path $bucketLoc $file
-                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$") {
+                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$" -and $file -ne '.scoop-migrations.json') {
                         switch ($status) {
                             { $_ -in 'A', 'M', 'R' } {
                                 [void]($using:updatedFiles).Add($filePath)
@@ -192,7 +192,7 @@ function Sync-Bucket {
                 Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-status', $previousCommit) | ForEach-Object {
                     $status, $file = $_ -split '\s+', 2
                     $filePath = Join-Path $bucketLoc $file
-                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$") {
+                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$" -and $file -ne '.scoop-migrations.json') {
                         switch ($status) {
                             { $_ -in 'A', 'M', 'R' } {
                                 [void]($updatedFiles).Add($filePath)
@@ -223,21 +223,28 @@ function remove_obsolete_wiring($ctx, $old_manifest, $new_manifest) {
     $shim_id = { param($entry) $target, $name, $null = Get-ShimDefinition $entry; "$name$([IO.Path]::GetExtension($target))" }
     $ids = @(arch_specific 'bin' $new_manifest $ctx.new_architecture | Where-Object { $_ -ne $null } | ForEach-Object { & $shim_id $_ })
     $removed = @(arch_specific 'bin' $old_manifest $ctx.architecture | Where-Object { $_ -ne $null } | Where-Object { (& $shim_id $_) -notin $ids })
-    if ($removed) { Remove-ShimFromManifest $ctx.app @{ bin = $removed } $ctx.global $ctx.architecture }
+    if ($removed) {
+        # the wiring was created under the name the app was installed as
+        $owner = if ($ctx.renamed_from) { $ctx.renamed_from } else { $ctx.app }
+        Remove-ShimFromManifest $owner @{ bin = $removed } $ctx.global $ctx.architecture
+    }
 
     # the shortcut is edited in place, its removed arguments and icons would stay
     $shortcuts = @(arch_specific 'shortcuts' $old_manifest $ctx.architecture | Where-Object { $_ -ne $null })
     if ($shortcuts) { rm_startmenu_shortcuts @{ shortcuts = $shortcuts } $ctx.global $ctx.architecture }
 
     $current = "$(Split-Path $ctx.dir)\current"
+    $old_dir = if ($ctx.renamed_from) { versiondir $ctx.renamed_from (Split-Path $ctx.dir -Leaf) $ctx.global } else { $ctx.dir }
+    $old_current = "$(Split-Path $old_dir)\current"
+    $old_persist_dir = if ($ctx.renamed_from) { persistdir $ctx.renamed_from $ctx.global } else { $ctx.persist_dir }
     $paths = @(env_paths $new_manifest $current $ctx.persist_dir $ctx.new_architecture)
     # the old paths were expanded with the version directory, a nightly manifest keeps the name 'nightly'
     $version = Split-Path $ctx.dir -Leaf
     if (get_config NO_JUNCTION) {
         # without junctions the paths point at the version directory
-        $removed = @(env_paths $old_manifest $ctx.dir $ctx.persist_dir $ctx.architecture)
+        $removed = @(env_paths $old_manifest $old_dir $old_persist_dir $ctx.architecture)
     } else {
-        $removed = @(env_paths $old_manifest $current $ctx.persist_dir $ctx.architecture) | Where-Object { $_ -notin $paths }
+        $removed = @(env_paths $old_manifest $old_current $old_persist_dir $ctx.architecture) | Where-Object { $_ -notin $paths }
     }
     if ($removed) {
         Remove-Path -Path $removed -Global:$ctx.global
@@ -260,11 +267,9 @@ function restore_app($ctx) {
     $old_manifest = $ctx.old_manifest
     $old_version = $ctx.old_version
     $backup = $ctx.backup
-    # the old manifest expands $version, which still names the failed update
-    $version = $old_version
+    # the backup would land inside the recreated directory
     if ($backup -and (Test-Path $backup)) {
         try {
-            # the backup would land inside the recreated directory
             if (Test-Path $ctx.dir) { Remove-Item $ctx.dir -Recurse -Force -ErrorAction Stop }
             Move-Item $backup $ctx.dir -ErrorAction Stop
         } catch {
@@ -272,17 +277,98 @@ function restore_app($ctx) {
             return
         }
     }
-    if (installed_manifest $ctx.app $old_version $ctx.global) {
-        Write-Host "Restoring '$($ctx.app)' ($old_version)"
-        $original_dir = $ctx.dir
+    $app = $ctx.app
+    $dir = $ctx.dir
+    $persist_dir = $ctx.persist_dir
+    if ($ctx.renamed_from -and (Test-Path -LiteralPath (appdir $ctx.app $ctx.global))) {
+        # the app goes back to the name it was installed under, so its links work again
         try {
-            $dir = link_current $ctx.dir
-            link_app $old_manifest $dir $original_dir $ctx.persist_dir $ctx.global $ctx.architecture
+            Move-Item -LiteralPath (appdir $app $ctx.global) -Destination (appdir $ctx.renamed_from $ctx.global) -ErrorAction Stop
+            if (Test-Path -LiteralPath $persist_dir) {
+                Move-Item -LiteralPath $persist_dir -Destination (persistdir $ctx.renamed_from $ctx.global) -ErrorAction Stop
+            }
+            move_app_cache $app $ctx.renamed_from
         } catch {
-            warn "'$($ctx.app)' ($old_version) was restored, but its links could not be recreated: $($_.Exception.Message)"
+            warn "'$($ctx.renamed_from)' could not be moved back: $($_.Exception.Message)"
+        }
+        $app = $ctx.renamed_from
+        $dir = versiondir $app $old_version $ctx.global
+        $persist_dir = persistdir $app $ctx.global
+    }
+    # the old manifest expands $version, which still names the failed update
+    $version = $old_version
+    if (installed_manifest $app $old_version $ctx.global) {
+        Write-Host "Restoring '$app' ($old_version)"
+        $original_dir = $dir
+        try {
+            $dir = link_current $dir
+            link_app $old_manifest $dir $original_dir $persist_dir $ctx.global $ctx.architecture
+        } catch {
+            warn "'$app' ($old_version) was restored, but its links could not be recreated: $($_.Exception.Message)"
         }
     } else {
-        warn "'$($ctx.app)' ($old_version) cannot be restored; its files were removed by the uninstaller."
+        warn "'$app' ($old_version) cannot be restored; its files were removed by the uninstaller."
+    }
+}
+
+function move_app($app, $new_app, $global, $manifest, $version) {
+    $old_persist = persistdir $app $global
+    $moved_persist = $false
+    if (Test-Path -LiteralPath $old_persist) {
+        Move-Item -LiteralPath $old_persist -Destination (persistdir $new_app $global) -ErrorAction Stop
+        $moved_persist = $true
+    }
+    $moved_app = $false
+    try {
+        Move-Item -LiteralPath (appdir $app $global) -Destination (appdir $new_app $global) -ErrorAction Stop
+        $moved_app = $true
+        move_app_cache $app $new_app
+        if ($moved_persist -and $manifest.persist) {
+            # persist_data builds its links from $dir in the caller's scope, and the old uninstall hooks read them there
+            $dir = versiondir $new_app $version $global
+            unlink_persist_data $manifest $dir
+            persist_data $manifest $dir (persistdir $new_app $global)
+        }
+    } catch {
+        if ($moved_app) { Move-Item -LiteralPath (appdir $new_app $global) -Destination (appdir $app $global) -ErrorAction SilentlyContinue }
+        if ($moved_persist) { Move-Item -LiteralPath (persistdir $new_app $global) -Destination $old_persist -ErrorAction SilentlyContinue }
+        move_app_cache $new_app $app
+        throw
+    }
+}
+
+function move_app_cache($app, $new_app) {
+    $pattern = '^' + [regex]::Escape($app) + '#'
+    Get-ChildItem -LiteralPath $cachedir -File -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -match $pattern } |
+        ForEach-Object {
+            # the same download may already be there under the new name
+            if (!(Test-Path -LiteralPath (Join-Path $cachedir ($_.Name -replace $pattern, "$new_app#")))) {
+                Rename-Item -LiteralPath $_.FullName -NewName ($_.Name -replace $pattern, "$new_app#")
+            }
+        }
+}
+
+function remove_saved_commands($manifest, $owner, $arch, $global) {
+    $shim_dir = shimdir $global
+    # not Remove-Shim: it also deletes an active command that now belongs to another app
+    $wanted = @(arch_specific 'bin' $manifest $arch | Where-Object { $_ } | ForEach-Object {
+            $target, $name, $null = Get-ShimDefinition $_
+            @('', '.shim', '.cmd', '.ps1') | ForEach-Object { "$name$_.$owner" }
+        })
+    if (!$wanted) { return }
+    Get-ChildItem -LiteralPath $shim_dir -File -Force -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -in $wanted } | Remove-Item -Force
+}
+
+function save_app_bucket($app, $bucket, $global) {
+    foreach ($version_dir in @(Get-ChildItem -LiteralPath (appdir $app $global) -Directory -Force | Where-Object { $_.Name -notmatch '^(current|_)' })) {
+        $info = install_info $app $version_dir.Name $global
+        if (!$info -or !$info.bucket) { continue }
+        $fields = @{}
+        $info.PSObject.Properties | ForEach-Object { $fields[$_.Name] = $_.Value }
+        $fields['bucket'] = $bucket
+        save_install_info $fields $version_dir.FullName
     }
 }
 
@@ -306,6 +392,7 @@ function switch_version($ctx) {
     if (-not $independent) {
         # the dependencies of the version that is switched to, not the ones the manifest has now
         $deps = @($installed.depends | Where-Object { $_ -and !(installed $_) } | ForEach-Object { Get-Dependency $_ $installed_architecture } | Where-Object { !(installed $_) } | Select-Object -Unique)
+        $deps = @(move_installed_apps $deps $global $independent $suggested $failed $use_cache $check_hash)
         $deps | ForEach-Object { install_app $_ $installed_architecture $global $suggested $failed $use_cache $check_hash }
         if (report_failed_deps $installed $app $app_key $failed) { return }
     }
@@ -333,7 +420,8 @@ function switch_version($ctx) {
         } catch {
             Write-Verbose $_.Exception.Message
         }
-        restore_app $ctx
+        # the switch already took the current link down, so the old links need rebuilding
+        $ctx.unlinked = $true
     }
 }
 
@@ -398,6 +486,7 @@ function replace_version($ctx) {
         if (-not $independent) {
             # Also add missing dependencies
             $apps = @(Get-Dependency $app $architecture) -ne $app
+            $apps = @(move_installed_apps $apps $global $independent $suggested $failed $use_cache $check_hash)
             $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
         }
 
@@ -408,20 +497,62 @@ function replace_version($ctx) {
             }
             install_version $app_name $manifest $version $new_architecture $global $bucket $url $suggested $failed $prepared.dir $prepared.fname
         }
-        if ($failed.ContainsKey($app_key)) {
-            restore_app $ctx
-        }
     } catch {
         $failed[$app_key] = $_.Exception.Message
         error $_.Exception.Message
-        if ($ctx.unlinked) {
-            restore_app $ctx
-        }
     }
+}
+
+# Moves an app installed under an old name, so the plan never installs a second copy.
+function move_installed_apps($apps, $global, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
+    $missing = @($apps | Where-Object { !(installed (parse_app $_)[0] $global) })
+    if (!$missing) { return $apps }
+    $recorded = @(Get-LocalBucket | ForEach-Object { Get-BucketMigrations $_ } | Where-Object { $_ } |
+        ForEach-Object { $_.PSObject.Properties.Name } | Select-Object -Unique)
+    $moved = @{}
+    foreach ($name in $recorded) {
+        if (!(installed $name $global)) { continue }
+        $version = Select-CurrentVersion -AppName $name -Global:$global
+        $info = install_info $name $version $global
+        if (!$info.bucket) { continue }
+        # the record of this scope: the same name may be installed in both
+        $resolved_app, $null, $resolved_bucket, $null = Get-Manifest "$($info.bucket)/$name"
+        $moved["$resolved_bucket/$resolved_app"] = [pscustomobject]@{ Name = $name; Version = $version; Hold = $info.hold }
+    }
+    $rest = @()
+    foreach ($entry in $apps) {
+        $wanted_app = $null
+        if ($entry -in $missing) {
+            # a request may still be one hop short of the app it names
+            $wanted_app, $null, $wanted_bucket, $null = Get-Manifest $entry
+            $key = "$wanted_bucket/$wanted_app"
+            if ($moved.ContainsKey($key)) {
+                $candidate = $moved[$key]
+                if ($candidate.Hold) {
+                    $failed[$wanted_app] = "'$wanted_app' is needed but '$($candidate.Name)' is held to $($candidate.Version)"
+                } else {
+                    try {
+                        update_app $candidate.Name $global $false $false $independent $suggested $failed $use_cache $check_hash | Out-Host
+                    } catch {
+                        $failed[$wanted_app] = $_.Exception.Message
+                    }
+                    # a skipped move still has to fail the apps that need it
+                    $reason = @($failed[$candidate.Name], $failed["$($candidate.Name) (global)"]) | Where-Object { $_ } | Select-Object -First 1
+                    if ($reason) { $failed[$wanted_app] = "$reason" -replace '^(skipped|blocked): ', '' }
+                }
+                $moved.Remove($key)
+                continue
+            }
+        }
+        $rest += $entry
+    }
+    return $rest
 }
 
 function update_app($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
     $app_key = app_key $app $global
+    $requested_key = $app_key
+    $app_name = $app
     $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
@@ -445,14 +576,52 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         if ($null -eq $bucket -and !$url) { $bucket = 'main' }
         $manifest = manifest $app $bucket $url
     }
+
+    $renamed_to = $null
+    $renamed_from = $null
+    $target = $null
+    if (!$manifest -and $bucket) {
+        $target_app, $target_manifest, $target_bucket, $target_url = Get-Manifest "$bucket/$app"
+        if ($target_app -ne $app -or $target_bucket -ine $bucket) {
+            $target = if ($target_bucket) { "$target_bucket/$target_app" } else { $target_app }
+            $renamed = $target_app -ne $app
+            $blocked = if (!$target_manifest) {
+                Get-BucketAddHint $target_bucket
+            } elseif ($renamed) {
+                if (installed $target_app $global) {
+                    "'$target_app' is already installed"
+                } elseif (Test-Path -LiteralPath (appdir $target_app $global)) {
+                    "'$(appdir $target_app $global)' already exists"
+                } elseif (Test-Path -LiteralPath (persistdir $target_app $global)) {
+                    "'$(persistdir $target_app $global)' already holds saved data"
+                } elseif (test_running_process $app $global) {
+                    'the app is running'
+                }
+            }
+            if ($blocked) {
+                $failed[$app_key] = "skipped: moved to '$target'; $blocked"
+                return
+            }
+            if ($renamed) {
+                $renamed_to = $target_app
+            } else {
+                save_app_bucket $app $target_bucket $global
+                Write-Host "Migrating '$app_key' to bucket '$target_bucket'"
+            }
+            $bucket = $target_bucket
+            $manifest = $target_manifest
+            $url = $null
+        }
+    }
+
     $version = $manifest.version
     if ($version -eq 'nightly') {
         $version = nightly_version $quiet
         $check_hash = $false
     }
 
-    if (!$force -and ($old_version -eq $version)) {
-        if (!$quiet) {
+    if (!$force -and !$renamed_to -and ($old_version -eq $version)) {
+        if (!$quiet -and !$target) {
             warn "The latest version of '$app' ($version) is already installed."
         }
         return
@@ -477,8 +646,17 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
 
     if (!(get_config 'download_while_running' $true) -and (block_running_app $app $global $app_key $failed 'updating')) { return }
 
+    if ($renamed_to) {
+        # The rename is the boundary: above it the app keeps its old name, below it the flow is the original one.
+        Write-Host "Migrating '$app_key' to '$target'"
+        move_app $app $renamed_to $global $old_manifest $old_version
+        $renamed_from = $app
+        $app = $app_name = $renamed_to
+        $app_key = app_key $app $global
+    }
+
     # a version that is still installed is switched to here, the same way 'scoop reset' does
-    $forced = $force -and $old_version -eq $version
+    $forced = ($force -or $renamed_to) -and $old_version -eq $version
     $dir = versiondir $app $old_version $global
     $persist_dir = persistdir $app $global
     $installed_dir = versiondir $app $version $global
@@ -508,42 +686,57 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         failed           = $failed
         use_cache        = $use_cache
         check_hash       = $check_hash
+        renamed_from     = $renamed_from
     }
     $retained = !(Test-Path -LiteralPath "$installed_dir\.scoop-extracted") -and
     ((Test-Path -LiteralPath "$installed_dir\scoop-manifest.json") -or (Test-Path -LiteralPath "$installed_dir\manifest.json"))
-    if (!$forced -and $retained) {
-        switch_version $ctx
-        return
-    }
+    # whatever exit the flow takes, a migration is rolled back unless it reached a successful end
+    $done = $false
+    try {
+        if (!$forced -and $retained) {
+            switch_version $ctx
+            $done = !$failed.ContainsKey($app_key)
+            return
+        }
 
-    # switching to a retained version downloads nothing, so only a new installation must support the architecture
-    if ($null -eq $new_architecture) {
-        error "'$app' doesn't support current architecture!"
-        $failed[$app_key] = 'unsupported architecture'
-        return
-    }
+        # switching to a retained version downloads nothing, so only a new installation must support the architecture
+        if ($null -eq $new_architecture) {
+            error "'$app' doesn't support current architecture!"
+            $failed[$requested_key] = 'unsupported architecture'
+            return
+        }
 
-    if (-not $independent) {
-        $helpers = Get-InstallationHelper $manifest $new_architecture
-        $needed = @($helpers | ForEach-Object { Get-Dependency $_ $new_architecture } | Select-Object -Unique)
-        $needed | Where-Object { !(installed $_) } | ForEach-Object {
-            install_app $_ $new_architecture $global $suggested $failed $use_cache $check_hash
+        if (-not $independent) {
+            $helpers = Get-InstallationHelper $manifest $new_architecture
+            $needed = @($helpers | ForEach-Object { Get-Dependency $_ $new_architecture } | Select-Object -Unique)
+            $needed = @(move_installed_apps $needed $global $independent $suggested $failed $use_cache $check_hash)
+            $needed | Where-Object { !(installed $_) } | ForEach-Object {
+                install_app $_ $new_architecture $global $suggested $failed $use_cache $check_hash
+            }
+        }
+
+        $stage = $null
+        if ($forced) {
+            $stage = versiondir $app "_$version.new" $global
+            Remove-Item $stage -Recurse -Force -ErrorAction SilentlyContinue
+        }
+        # download and extract the new version first, so a broken archive cannot leave the app uninstalled
+        $ctx.prepared = prepare_app $app $new_architecture $global $manifest $bucket $version $use_cache $check_hash $stage
+        if (!$ctx.prepared) {
+            $failed[$requested_key] = 'download failed'
+            return
+        }
+
+        replace_version $ctx
+        $done = !$failed.ContainsKey($app_key)
+    } finally {
+        if (!$done -and ($renamed_from -or $ctx.unlinked)) {
+            restore_app $ctx
+        } elseif ($done -and $target) {
+            save_app_bucket $app_name $bucket $global
+            if ($renamed_to) { remove_saved_commands $old_manifest $renamed_from $architecture $global }
         }
     }
-
-    $stage = $null
-    if ($forced) {
-        $stage = versiondir $app "_$version.new" $global
-        Remove-Item $stage -Recurse -Force -ErrorAction SilentlyContinue
-    }
-    # download and extract the new version first, so a broken archive cannot leave the app uninstalled
-    $ctx.prepared = prepare_app $app $new_architecture $global $manifest $bucket $version $use_cache $check_hash $stage
-    if (!$ctx.prepared) {
-        $failed[$app_key] = 'download failed'
-        return
-    }
-
-    replace_version $ctx
 }
 
 function update_apps($apps, $force, $quiet, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {

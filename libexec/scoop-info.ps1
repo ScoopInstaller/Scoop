@@ -21,10 +21,29 @@ if (!$manifest) {
     abort "Could not find manifest for '$(show_app $app)' in local buckets."
 }
 
-$global = installed $app $true
-$status = app_status $app $global
-$install = install_info $app $status.version $global
-$status.installed = ($bucket -and $install.bucket -eq $bucket) -or (installed $app)
+$requested_name = if ($original_app -match '^[a-zA-Z0-9-_.]+(?:/[a-zA-Z0-9-_.]+)?(?:@.+)?$') { (parse_app $original_app)[0] }
+# A migrated app keeps the name it is installed under; only the manifest is new.
+$installed_as = $app
+if ($requested_name -and $requested_name -ne $app -and (installed $requested_name)) {
+    if (!(parse_app $original_app)[1]) {
+        # a bare name is resolved through the record above, so the two agree
+        $installed_as = $requested_name
+    } else {
+        $installed_global = installed $requested_name $true
+        $installed_info = install_info $requested_name (Select-CurrentVersion -AppName $requested_name -Global:$installed_global) $installed_global
+        # a request that names a bucket resolves through it, which may differ from the record
+        if ($installed_info.bucket) {
+            $resolved = @(Get-Manifest "$($installed_info.bucket)/$requested_name")
+            if (($resolved[0] -eq $app) -and ($resolved[2] -eq $bucket)) {
+                $installed_as = $requested_name
+            }
+        }
+    }
+}
+$global = installed $installed_as $true
+$status = app_status $installed_as $global
+$install = install_info $installed_as $status.version $global
+$status.installed = ($bucket -and $install.bucket -eq $bucket) -or (installed $installed_as)
 $version_output = $manifest.version
 $manifest_file = if ($bucket) {
     manifest_path $app $bucket
@@ -51,15 +70,16 @@ if ((Test-Path $original_app) -or ($original_app -match '^(ht|f)tps?://|\\\\')) 
 }
 
 if ($verbose) {
-    $dir = currentdir $app $global
-    $original_dir = versiondir $app $manifest.version $global
-    $persist_dir = persistdir $app $global
+    $dir = currentdir $installed_as $global
+    $original_dir = versiondir $installed_as $manifest.version $global
+    $persist_dir = persistdir $installed_as $global
 } else {
     $dir, $original_dir, $persist_dir = '<root>', '<root>', '<root>'
 }
 
 if ($status.installed) {
-    $manifest_file = manifest_path $app $install.bucket
+    $installed_manifest = manifest_path $installed_as $install.bucket
+    if ($installed_manifest) { $manifest_file = $installed_manifest }
     if ($install.url) {
         $manifest_file = $install.url
     }
@@ -75,7 +95,7 @@ if ($status.installed) {
 
 }
 
-$item = [ordered]@{ Name = $app }
+$item = [ordered]@{ Name = $installed_as }
 if ($status.deprecated) {
     $item.Name += ' (DEPRECATED)'
 }
@@ -143,8 +163,8 @@ if ($status.installed) {
     # Show installed versions
     if (!$standalone -or $same_source) {
         $installed_output = @()
-        Get-InstalledVersion -AppName $app -Global:$global | ForEach-Object {
-            $installed_output += if ($verbose) { versiondir $app $_ $global } else { "$_$(if ($global) { ' *global*' })" }
+        Get-InstalledVersion -AppName $installed_as -Global:$global | ForEach-Object {
+            $installed_output += if ($verbose) { versiondir $installed_as $_ $global } else { "$_$(if ($global) { ' *global*' })" }
         }
         $item.Installed = $installed_output -join "`n"
     }
@@ -154,10 +174,10 @@ if ($status.installed) {
         $appsdir = appsdir $global
 
         # Collect file list from each location
-        $appFiles = Get-ChildItem $appsdir -Filter $app
-        $currentFiles = Get-ChildItem $appFiles.FullName -Filter (Select-CurrentVersion $app $global)
+        $appFiles = Get-ChildItem $appsdir -Filter $installed_as
+        $currentFiles = Get-ChildItem $appFiles.FullName -Filter (Select-CurrentVersion $installed_as $global)
         $persistFiles = Get-ChildItem $persist_dir -ErrorAction Ignore # Will fail if app does not persist data
-        $cacheFiles = Get-ChildItem $cachedir -Filter "$app#*"
+        $cacheFiles = Get-ChildItem $cachedir -Filter "$installed_as#*"
 
         # Get the sum of each file list
         $fileTotals = @()

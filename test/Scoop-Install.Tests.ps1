@@ -1,8 +1,10 @@
 BeforeAll {
     . "$PSScriptRoot\Scoop-TestLib.ps1"
     . "$PSScriptRoot\..\lib\core.ps1"
+    . "$PSScriptRoot\..\lib\buckets.ps1"
     . "$PSScriptRoot\..\lib\system.ps1"
     . "$PSScriptRoot\..\lib\manifest.ps1"
+    . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
     . "$PSScriptRoot\..\lib\shortcuts.ps1"
     . "$PSScriptRoot\..\lib\psmodules.ps1"
     . "$PSScriptRoot\..\lib\shim.ps1"
@@ -26,6 +28,7 @@ Describe 'install_app' -Tag 'Scoop' {
         Mock Get-Manifest { 'foo', [PSCustomObject]@{ version = '1.0' }, 'main', $null }
         Mock Get-SupportedArchitecture { '64bit' }
         Mock error {}
+        Mock manifest_path { $null }
     }
 
     It 'should report the failure without aborting the batch' {
@@ -108,6 +111,14 @@ Describe 'install_app' -Tag 'Scoop' {
 
         $deps | Should-BeCollection -Count 1
         @($deps)[0] | Should-Be 'bar'
+    }
+
+    It 'should find the failure of a dependency listed under its old name' {
+        $manifest = [PSCustomObject]@{ depends = @('old-name') }
+        $failed = @{ 'new-name' = 'download failed' }
+        Mock Get-Manifest { 'new-name', $null, 'main', $null }
+
+        failed_deps $manifest $failed | Should-BeCollection @('new-name')
     }
 
     It 'should not ask for the manifest when the update flow installs a dependency' {

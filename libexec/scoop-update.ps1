@@ -435,7 +435,7 @@ if (-not ($apps -or $all)) {
             ($app, $global) = $_
             $status = app_status $app $global
             $is_pin = $status.pinned
-            if ($status.installed -and ($force -or $status.outdated)) {
+            if ($status.installed -and ($force -or $status.outdated -or $status.renamed)) {
                 if (!$status.hold) {
                     if ($is_pin -and !$force) {
                         $app_key = app_key $app $global
@@ -444,7 +444,7 @@ if (-not ($apps -or $all)) {
                         return
                     }
                     $outdated += applist $app $global
-                    $latest = if ($force -and $is_pin) { 'HEAD (forced)' } else { $status.latest_version }
+                    $latest = if ($status.renamed) { $status.renamed } elseif ($force -and $is_pin) { 'HEAD (forced)' } else { $status.latest_version }
                     Write-Host -f yellow ("$app`: $($status.version) -> $latest{0}" -f ('', ' (global)')[$global])
                 } else {
                     $app_key = app_key $app $global

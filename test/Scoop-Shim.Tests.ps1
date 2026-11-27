@@ -163,7 +163,9 @@ Describe 'Read-ShimFile' -Tag 'Scoop' {
             'runas = YES',
             'env:FOO = ""bar""',
             'BAR = baz',
-            'env!:PATH = %PATH%;D:\bin'
+            'env!:PATH = %PATH%;D:\bin',
+            'env?:QUX = quux',
+            'ENV?:MIXED = mixed'
         )
         [IO.File]::WriteAllText($shimPath, ($lines -join "`n"), (New-Object Text.UTF8Encoding($true)))
 
@@ -173,10 +175,9 @@ Describe 'Read-ShimFile' -Tag 'Scoop' {
         $shim.Arguments | Should-BeCollection @('--one', '"--two three"')
         $shim.Cwd | Should-Be 'D:\work'
         $shim.Elevate | Should-BeTrue
-        $shim.Env.Name | Should-BeCollection @('FOO', 'BAR', 'PATH')
+        $shim.Env.Name | Should-BeCollection @('FOO', 'BAR', 'PATH', 'QUX', 'MIXED')
         $shim.Env[0].Value | Should-Be '""bar""'
-        $shim.Env[0].Force | Should-BeFalse
-        $shim.Env[2].Force | Should-BeTrue
+        $shim.Env.Prefix | Should-BeCollection @('env:', '', 'env!:', 'env?:', 'env?:')
         $shim.Env[2].Value | Should-Be '%PATH%;D:\bin'
         $shim.Diagnostics | Should-BeCollection -Count 0
     }

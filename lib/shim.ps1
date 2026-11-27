@@ -80,6 +80,20 @@ function Get-AppNameFromPath($Path) {
     return $appName
 }
 
+function Split-ShimEnvKey($Key) {
+    # 'env?:NAME' is a default the body carries, 'env!:' a forced value, 'env:' a plain variable
+    if ($Key -match '^env([?!]?):(.*)$') {
+        [pscustomobject]@{
+            Prefix     = "env$($Matches[1]):"
+            Name       = $Matches[2]
+            ShimScoped = [bool]$Matches[1]
+            Feature    = switch ($Matches[1]) { '?' { 'env' } '!' { 'env-force' } default { $null } }
+        }
+    } else {
+        [pscustomobject]@{ Prefix = ''; Name = $Key; ShimScoped = $false; Feature = $null }
+    }
+}
+
 function Read-ShimFile($ShimPath) {
     $shim = [pscustomobject]@{ Path = $null; Arguments = @(); Cwd = $null; Elevate = $false; Env = @(); Diagnostics = @() }
     if (!(Test-Path -LiteralPath $ShimPath -PathType Leaf)) { return $shim }
@@ -110,11 +124,9 @@ function Read-ShimFile($ShimPath) {
             { $_ -in 'cwd', 'workdir' } { $shim.Cwd = $value }
             { $_ -in 'elevate', 'runas' } { $shim.Elevate = $value -match '^(?i:true|1|yes)$' }
             default {
-                $name = $key
-                $force = $name -imatch '^env!:(.*)$'
-                if ($force) { $name = $Matches[1] } elseif ($name -imatch '^env:(.*)$') { $name = $Matches[1] }
-                if (!$name) { & $report $lineNo 'BareEnv' "$key names no variable"; continue }
-                $env.Add([pscustomobject]@{ Name = $name; Value = $value; Force = $force; Line = $lineNo })
+                $env_key = Split-ShimEnvKey $key
+                if (!$env_key.Name) { & $report $lineNo 'BareEnv' "$key names no variable"; continue }
+                $env.Add([pscustomobject]@{ Name = $env_key.Name; Value = $value; Prefix = $env_key.Prefix; Feature = $env_key.Feature; Line = $lineNo })
             }
         }
     }
@@ -621,7 +633,7 @@ function Get-ShimInfo($ShimPath, [switch]$Detailed) {
         if ($shim.Cwd) { $info.Cwd = $shim.Cwd -replace '^"(.*)"$', '$1' }
         $info.Elevate = $shim.Elevate
         if ($shim.Env) {
-            $info.Env = @($shim.Env | ForEach-Object { '{0}{1} = {2}' -f $(if ($_.Force) { 'env!:' } else { 'env:' }), $_.Name, ($_.Value -replace '^"(.*)"$', '$1') }) -join "`n"
+            $info.Env = @($shim.Env | ForEach-Object { '{0}{1} = {2}' -f $_.Prefix, $_.Name, ($_.Value -replace '^"(.*)"$', '$1') }) -join "`n"
         }
         $diagnostics = @($shim.Diagnostics | ForEach-Object { 'line {0}: {1}' -f $_.Line, $_.Message })
         if ($diagnostics) { $info.Diagnostics = $diagnostics -join '; ' }
@@ -642,7 +654,7 @@ function Get-ShimInfo($ShimPath, [switch]$Detailed) {
                 if ($shim.Arguments) { $info.Args = Resolve-ShimValue ($shim.Arguments -join ' ') $targetDir $body.Features -Raw }
                 if ($shim.Cwd) { $info.Cwd = Resolve-ShimValue $shim.Cwd $targetDir $body.Features }
                 if ($shim.Env) {
-                    $info.Env = @($shim.Env | ForEach-Object { '{0}{1} = {2}' -f $(if ($_.Force) { 'env!:' } else { 'env:' }), $_.Name, (Resolve-ShimValue $_.Value $targetDir $body.Features) }) -join "`n"
+                    $info.Env = @($shim.Env | ForEach-Object { '{0}{1} = {2}' -f $_.Prefix, $_.Name, (Resolve-ShimValue $_.Value $targetDir $body.Features) }) -join "`n"
                 }
             }
         }

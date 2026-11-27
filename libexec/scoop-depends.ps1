@@ -24,7 +24,7 @@ Get-Dependency $app $architecture | ForEach-Object {
     $dep = [ordered]@{}
 
     $app, $null, $bucket, $url = Get-Manifest $_
-    if (!$url) {
+    if (!$url -and $_ -match '/') {
         $bucket, $app = $_ -split '/'
     }
     $dep.Source = if ($url) { $url } else { $bucket }
