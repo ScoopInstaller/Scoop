@@ -668,3 +668,107 @@ Describe 'app_status of a renamed app' -Tag 'Scoop' {
         $status.renamed | Should-BeNull
     }
 }
+
+Describe 'lastupdate' -Tag 'Scoop' {
+    BeforeAll {
+        $origTemp = $env:TEMP
+        $origScoopdir = $scoopdir
+        $origConfigFile = $configFile
+        $origScoopConfig = $scoopConfig
+
+        $lastupdateScratch = Join-Path ([IO.Path]::GetTempPath()) 'ScoopLastUpdateTest'
+        $scoopdir = Join-Path $lastupdateScratch 'root'
+        $tempMarkerDir = Join-Path $lastupdateScratch 'temp'
+        $configFile = Join-Path $lastupdateScratch 'config.json'
+        New-Item -ItemType Directory -Force -Path $scoopdir, $tempMarkerDir | Out-Null
+        # the marker helpers read $env:TEMP at call time
+        $env:TEMP = $tempMarkerDir
+    }
+
+    AfterAll {
+        Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $lastupdateScratch
+        $env:TEMP = $origTemp
+        $scoopdir = $origScoopdir
+        $configFile = $origConfigFile
+        $scoopConfig = $origScoopConfig
+    }
+
+    BeforeEach {
+        # start in marker mode: no legacy config key, no markers, no config file
+        $scoopConfig = New-Object -TypeName PSObject
+        Remove-Item -Force -ErrorAction SilentlyContinue $configFile, "$scoopdir\lastupdate", "$tempMarkerDir\scoop_lastupdate"
+    }
+
+    It 'defaults the marker file to the TEMP directory' {
+        get_lastupdate_file | Should-Be "$tempMarkerDir\scoop_lastupdate"
+    }
+
+    It 'prefers the root marker when it exists' {
+        New-Item -ItemType File -Force -Path "$scoopdir\lastupdate" | Out-Null
+
+        get_lastupdate_file | Should-Be "$scoopdir\lastupdate"
+    }
+
+    It 'round-trips the timestamp through the TEMP marker' {
+        set_lastupdate '2026-01-16T12:34:56.7890000+08:00'
+
+        get_lastupdate | Should-Be '2026-01-16T12:34:56.7890000+08:00'
+        [IO.File]::ReadAllText("$tempMarkerDir\scoop_lastupdate").Trim() | Should-Be '2026-01-16T12:34:56.7890000+08:00'
+        Test-Path $configFile | Should-BeFalse
+    }
+
+    It 'writes the root marker when it exists' {
+        New-Item -ItemType File -Force -Path "$scoopdir\lastupdate" | Out-Null
+
+        set_lastupdate '2026-01-16T12:34:56.7890000+08:00'
+
+        [IO.File]::ReadAllText("$scoopdir\lastupdate").Trim() | Should-Be '2026-01-16T12:34:56.7890000+08:00'
+        Test-Path "$tempMarkerDir\scoop_lastupdate" | Should-BeFalse
+    }
+
+    It 'keeps using the config in legacy mode' {
+        $scoopConfig | Add-Member -MemberType NoteProperty -Name 'last_update' -Value '2020-01-01T00:00:00.0000000+00:00'
+
+        get_lastupdate | Should-Be '2020-01-01T00:00:00.0000000+00:00'
+
+        set_lastupdate '2026-01-16T12:34:56.7890000+08:00'
+
+        $scoopConfig.'last_update' | Should-Be '2026-01-16T12:34:56.7890000+08:00'
+        Test-Path "$tempMarkerDir\scoop_lastupdate" | Should-BeFalse
+        Test-Path "$scoopdir\lastupdate" | Should-BeFalse
+    }
+
+    It 'reports outdated and stamps the TEMP marker when nothing is stored' {
+        is_scoop_outdated | Should-BeTrue
+        Test-Path "$tempMarkerDir\scoop_lastupdate" | Should-BeTrue
+
+        # the fresh stamp makes the next check pass
+        is_scoop_outdated | Should-BeFalse
+    }
+
+    It 'reports outdated for a stale marker' {
+        set_lastupdate ([System.DateTime]::Now.AddHours(-4).ToString('o'))
+
+        is_scoop_outdated | Should-BeTrue
+    }
+
+    It 'stamps an empty root marker in place' {
+        New-Item -ItemType File -Force -Path "$scoopdir\lastupdate" | Out-Null
+
+        is_scoop_outdated | Should-BeTrue
+        is_scoop_outdated | Should-BeFalse
+
+        ([IO.File]::ReadAllText("$scoopdir\lastupdate").Length -gt 0) | Should-BeTrue
+        Test-Path "$tempMarkerDir\scoop_lastupdate" | Should-BeFalse
+    }
+
+    It 'restamps the config in legacy mode on garbage' {
+        $scoopConfig | Add-Member -MemberType NoteProperty -Name 'last_update' -Value 'garbage'
+
+        is_scoop_outdated | Should-BeTrue
+        is_scoop_outdated | Should-BeFalse
+
+        ($scoopConfig.'last_update' -ne 'garbage') | Should-BeTrue
+        Test-Path "$tempMarkerDir\scoop_lastupdate" | Should-BeFalse
+    }
+}
