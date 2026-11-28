@@ -669,7 +669,7 @@ Describe 'app_status of a renamed app' -Tag 'Scoop' {
     }
 }
 
-Describe 'lastupdate' -Tag 'Scoop' {
+Describe 'lastupdate' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $origTemp = $env:TEMP
         $origScoopdir = $scoopdir
