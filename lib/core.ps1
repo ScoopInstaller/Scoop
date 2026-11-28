@@ -1071,14 +1071,46 @@ function show_app($app, $bucket, $version) {
     return $app
 }
 
+function get_lastupdate_file() {
+    # The root marker wins if it exists (opt-in, for portable mode),
+    # the TEMP marker is the default
+    $rootMarker = "$scoopdir\lastupdate"
+    if (Test-Path $rootMarker) { return $rootMarker }
+    return "$env:TEMP\scoop_lastupdate"
+}
+
+function get_lastupdate() {
+    # Legacy mode: the config key, if present, always wins
+    $legacy = get_config LAST_UPDATE
+    if ($null -ne $legacy) { return $legacy }
+    $file = get_lastupdate_file
+    if (Test-Path $file) {
+        return [System.IO.File]::ReadAllText($file).Trim()
+    }
+    return $null
+}
+
+function set_lastupdate($time) {
+    if ($null -ne (get_config LAST_UPDATE)) {
+        set_config LAST_UPDATE $time | Out-Null
+        return
+    }
+    try {
+        Out-UTF8File -FilePath (get_lastupdate_file) -InputObject $time -NoNewLine
+    } catch {
+        # Skip persisting on failure (e.g. no write access to the root marker)
+        return
+    }
+}
+
 function is_scoop_outdated() {
     $now = [System.DateTime]::Now
     try {
-        $expireHour = (New-TimeSpan (get_config LAST_UPDATE) $now).TotalHours
+        $expireHour = (New-TimeSpan (get_lastupdate) $now).TotalHours
         return ($expireHour -ge 3)
     } catch {
-        # If not System.DateTime
-        set_config LAST_UPDATE ($now.ToString('o')) | Out-Null
+        # missing or unparseable timestamp
+        set_lastupdate ($now.ToString('o'))
         return $true
     }
 }

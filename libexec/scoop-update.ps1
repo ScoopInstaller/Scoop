@@ -61,7 +61,7 @@ if (-not ($apps -or $all)) {
     }
     Sync-Scoop -Log:$show_update_log
     Sync-Bucket -Log:$show_update_log
-    set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
+    set_lastupdate ([System.DateTime]::Now.ToString('o'))
     success 'Scoop was updated successfully!'
 } else {
     if ($global -and !(is_admin)) {
@@ -76,7 +76,7 @@ if (-not ($apps -or $all)) {
     if ($updateScoop) {
         Sync-Scoop -Log:$show_update_log
         Sync-Bucket -Log:$show_update_log
-        set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
+        set_lastupdate ([System.DateTime]::Now.ToString('o'))
         success 'Scoop was updated successfully!'
     }
 
